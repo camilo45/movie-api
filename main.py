@@ -1,5 +1,5 @@
 from config.database import  engine, Base
-from middlewares.error_hadler import ErrorHandler
+#from middlewares.error_hadler import ErrorHandler
 from routes.movie import movie_router
 from routes.user import user_router
 from fastapi import FastAPI, Request
@@ -24,7 +24,7 @@ app.include_router(movie_router)
 app.include_router(user_router)
 
 
-app.add_middleware(ErrorHandler)
+#app.add_middleware(ErrorHandler)
 
 Base.metadata.create_all(bind=engine)
 
