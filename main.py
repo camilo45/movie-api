@@ -1,15 +1,21 @@
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, JSONResponse
-from pydantic import BaseModel
 from config.database import  engine, Base
 from middlewares.error_hadler import ErrorHandler
 from routes.movie import movie_router
-from utils.jwt_manger import create_token
 from routes.user import user_router
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
 import uvicorn
 
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="static")
+
 app.title = "Mi aplicación con  FastAPI"
 app.version = "0.0.1"
 
@@ -23,11 +29,12 @@ app.add_middleware(ErrorHandler)
 Base.metadata.create_all(bind=engine)
 
 
-
-@app.get('/', tags=['home'])
-def message():
-    return HTMLResponse('<h1>Hello world</h1>')
-
+@app.get ("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("index.html",{
+        "request":request,
+        "message": "Hola gente, esta es my api con FastAPI"
+        })
 
 if __name__ == '__main__':
-   uvicorn.run("main:app", host="127.0.0.1", port=80, log_level="info", reload=True) 
+   uvicorn.run("main:app", host="0.0.0.0",port=10000, log_level="info", reload=True) 
